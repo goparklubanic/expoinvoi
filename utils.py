@@ -18,8 +18,24 @@ def list_excel_files(folder_path='resources'):
     ]
     return excel_files
 
+# Find Buyer Name
+def buyername(file_name, folder_path='resources'):
+    file_path = os.path.join(folder_path, file_name)
+    try:
+        wb = load_workbook(file_path, data_only=True)
+        ws = wb.active
+
+        # Get content of Cell B8
+        buyer_name = ws['B8'].value
+        if buyer_name is None:
+            buyer_name = "Veronique Oro"
+
+        return buyer_name
+    except Exception as e:
+        print(f"Error processing {file_name}: {e}")
+
 # Extracting Data
-def process_clearance_file(file_name, folder_path='resources'):
+def process_clearance_file(file_name, buyer_name, folder_path='resources'):
     file_path = os.path.join(folder_path, file_name)
     header_row = 15
     data_start_row = header_row + 1
@@ -59,6 +75,7 @@ def process_clearance_file(file_name, folder_path='resources'):
             row_dict = dict(zip(headers, row_values))
             row_dict["Label"] = current_label
             row_dict["File"] = file_name
+            row_dict["Buyer Name"] = buyer_name
             all_data.append(row_dict)
 
     except Exception as e:
@@ -69,7 +86,7 @@ def process_clearance_file(file_name, folder_path='resources'):
 
 def clean_clearance_dataframe(df):
     """Clean and normalize clearance DataFrame with specific logic."""
-    keep_columns = ["PO#", "Item No.", "Metal", "Q'ty", "Total W't", "maklon", "total", "File"]
+    keep_columns = ["PO#", "Item No.", "Metal", "Q'ty", "Total W't", "maklon", "total", "File","Buyer Name"]
 
     # Match columns (case-insensitive, flexible naming)
     col_map = {}
@@ -108,7 +125,9 @@ def clean_clearance_dataframe(df):
     final_df = pd.DataFrame(cleaned_rows)
 
     # Reorder columns to make "File" first
-    columns_ordered = ["File"] + [col for col in keep_columns if col != "File" and col in final_df.columns]
+    # columns_ordered = ["File"] + [col for col in keep_columns if col != "File" and col in final_df.columns]
+    # Reorder columns to make buyername first
+    columns_ordered = ["Buyer Name"] + [col for col in keep_columns if col != "Buyer Name" and col in final_df.columns]
     final_df = final_df[columns_ordered]
 
     return final_df
