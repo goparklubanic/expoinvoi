@@ -1,8 +1,8 @@
 import os
 from openpyxl import load_workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
-
 import pandas as pd
+import sys
 # Pandas options to show full data frame
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
@@ -85,9 +85,11 @@ def process_clearance_file(file_name, buyer_name, folder_path='resources'):
     return pd.DataFrame(all_data)
 
 def clean_clearance_dataframe(df):
+    # Print first 5 rows of df only form colum total and maklon
+    print(df.head(5))
     """Clean and normalize clearance DataFrame with specific logic."""
     keep_columns = ["PO#", "Item No.", "Metal", "Q'ty", "Total W't", "maklon", "total", "File","Buyer Name"]
-
+    
     # Match columns (case-insensitive, flexible naming)
     col_map = {}
     for col in df.columns:
@@ -99,7 +101,9 @@ def clean_clearance_dataframe(df):
     # Keep only matched columns
     df = df[[col_map[col] for col in keep_columns if col in col_map]]
     df = df.rename(columns={v: k for k, v in col_map.items()})  # Rename to standard
-
+    # Print first 5 rows
+    print(df.head(5))
+    sys.exit();
     # Process PO# column
     cleaned_rows = []
     temp_po = None
@@ -151,3 +155,21 @@ def save_dataframe_to_excel(df, output_path='result/Extracted.xlsx'):
         df.to_excel(output_path, index=False)
     
     print(f"✅ Appended data to {output_path}")
+
+def fillempty(file):
+    wb = load_workbook(f'resources/{file}')
+    ws = wb.active
+    for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=1):
+        for cell in row:
+            # If cell value is None then put 20 into the cell
+            if cell.value is None:
+                cell.value = 20
+            if cell.value is not None and str(cell.value).lower() == 'total':
+                total_row = cell.row
+                break
+        else:
+            continue
+        break
+    # print(f"Total found at row number: {total_row}");
+    # Save the file
+    wb.save(f'resources/{file}')
