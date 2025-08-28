@@ -25,6 +25,8 @@ def createDataframe(file_name, folder_path='resources'):
     start_col = 1
     end_col = ws.max_column
     headers = [cell.value for cell in ws[header_row][start_col-1:end_col]]
+    # print(headers)
+    # sys.exit();
 
     # print the length of headers
     header_length = len(headers)
