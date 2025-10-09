@@ -44,7 +44,8 @@ def createDataframe(file_name, folder_path='resources'):
     
     df.columns = headers
 
-    df = df[["PO#", "Item No.", "Metal", "Q'ty", "Total w't", "maklon", "total"]]
+    # df = df[["PO#", "Item No.", "Metal", "Q'ty", "Total w't", "maklon", "total"]]
+    df = df[["PO#", "Item No.", "Metal", "Q'ty", "Total w't", "manufacturing","non us dia","total"]]
     return df
 
 def stripRows(df):
@@ -72,7 +73,7 @@ def stripRows(df):
 def addBuyer(df, buyer_name):
     df["Buyer Name"] = buyer_name
     # re arrange the column order. put Buyer Name to the first column
-    df = df[["Buyer Name", "PO#", "Item No.", "Metal", "Q'ty", "Total w't", "maklon", "total"]]
+    df = df[["Buyer Name", "PO#", "Item No.", "Metal", "Q'ty", "Total w't", "manufacturing", "non us dia","total"]]
     return df
 
 def AppendToExcel(df, output_path='result/Extracted.xlsx'):
